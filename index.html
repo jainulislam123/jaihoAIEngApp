@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jaiho AI English Tutor</title>
+    <link rel="shortcut icon" href="https://i.postimg.cc/YSxLhbFg/fac.png" type="image/x-icon">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f0f4f8; /* Soft blue-gray background */
+    
+      }
+.welcomeText{
+  text-shadow: 2px 3px 4px rgb(45, 42, 42);
+  font-size: 30px;
+  color: #e6e8ea;
+  font-variant: small-caps;
+}
+.subheading{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 346px;
+  gap: 2rem;
+}
+      /* Chat Bubbles */
+      .bubble {
+        max-width: 85%;
+        padding: 12px 16px;
+        position: relative;
+        line-height: 1.5;
+        font-size: 0.95rem;
+      }
+      .bubble-ai {
+        background-color: #e2e8f0; /* Gray-200 */
+        color: #1e293b; /* Slate-800 */
+        border-radius: 18px 18px 18px 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      .bubble-user {
+        background-color: #3b82f6; /* Blue-500 */
+        color: white;
+        border-radius: 18px 18px 4px 18px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Corrections Highlighting */
+      .correction-highlight {
+        background-color: #fef3c7; /* Amber-100 */
+        border-left: 3px solid #f59e0b; /* Amber-500 */
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #4b5563;
+      }
+
+      /* Mic Pulse Animation */
+      .mic-active {
+        animation: pulse-red 1.5s infinite;
+        background-color: #fee2e2 !important; /* Red-100 */
+        color: #dc2626 !important; /* Red-600 */
+        border-color: #dc2626 !important;
+      }
+      @keyframes pulse-red {
+        0% {
+          box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+        }
+      }
+
+      /* Loading Dots */
+      .dot-flashing {
+        position: relative;
+        width: 6px;
+        height: 6px;
+        border-radius: 5px;
+        background-color: #9880ff;
+        color: #9880ff;
+        animation: dot-flashing 1s infinite linear alternate;
+        animation-delay: 0.5s;
+      }
+      .dot-flashing::before,
+      .dot-flashing::after {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        top: 0;
+      }
+      .dot-flashing::before {
+        left: -10px;
+        width: 6px;
+        height: 6px;
+        border-radius: 5px;
+        background-color: #9880ff;
+        color: #9880ff;
+        animation: dot-flashing 1s infinite alternate;
+        animation-delay: 0s;
+      }
+      .dot-flashing::after {
+        left: 10px;
+        width: 6px;
+        height: 6px;
+        border-radius: 5px;
+        background-color: #9880ff;
+        color: #9880ff;
+        animation: dot-flashing 1s infinite alternate;
+        animation-delay: 1s;
+      }
+      @keyframes dot-flashing {
+        0% {
+          background-color: #9880ff;
+        }
+        50%,
+        100% {
+          background-color: #ebe6ff;
+        }
+      }
+
+      /* Scrollbar styling */
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body class="h-screen w-full flex flex-col items-center justify-center">
+    <!-- App Container -->
+    <div
+      class="w-full max-w-md h-[100dvh] md:h-[90vh] bg-white md:rounded-2xl shadow-2xl flex flex-col overflow-hidden relative"
+    >
+      <!-- Start Overlay (To handle Autoplay Policy) https://i.postimg.cc/Kcw73WzH/GUl_Xay_LWOGo57e_Fn_PEf_QA98Ix4.avif-->
+      <div
+        id="start-overlay"
+        class="absolute inset-0 bg-white-100/95 z-50 flex flex-col items-center justify-center p-6 text-center backdrop-blur-sm hidden bg-[url('./images/aii.gif')] bg-contain bg-no-repeat bg-center "
+      >
+        <div class="bg-blue-100 p-4 rounded-full mb-6 animate-bounce">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-10 w-10 text-blue-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+       <div class="flex flex-col justify-center items-center relative -bottom-20">
+         <h2 class=" font-bold text-  text-shadow-lg welcomeText">
+          Welcome to Jaiho English  App
+        </h2>
+        <p class="text-gray-600 mb-8">
+          Click start to meet your AI English tutor.
+        </p>
+        <button
+          id="start-class-btn"
+          class="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center gap-2 "
+        >
+          <span>Improve English</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+       </div>
+      </div>
+
+      <!-- Stop Audio Button (Floating) -->
+      <button
+        id="stop-audio-btn"
+        class="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold hidden z-20 flex items-center gap-2 hover:bg-red-600 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Stop Audio
+      </button>
+
+      <!-- Header -->
+      <header
+        class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-md z-10"
+      >
+      <!-- https://i.postimg.cc/43MyVHXW/Gemini_Generated_Image_uoo5wiuoo5wiuoo5-removebg-preview.png -->
+      
+          <div class="bg-white/20 rounded-full backdrop-blur-sm flex items-center justify-bewteen gap-4">
+            <img class="rounded-full"
+              src="./images/aii.gif"
+              alt="JainulEnglishApp"
+              width="50px"
+            />
+            <h1 class="font-bold text-lg">Jaiho AI English Tutor</h1>
+          </div>
+          <div class="flex justify-bewteen items-center gap-2">     
+            <p class="text-xs text-blue-100 flex items-center gap-1 center">
+              <span
+                class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
+              ></span>
+              Online • with Bangla Correction Mode
+            </p>
+               <p  class="flex items-center gap-2"> 
+              <span><a href="https://www.linkedin.com/in/jainulislam123/"><i class="fa-brands fa-linkedin"></i></a></i></span>
+              <span><a href="https://www.youtube.com/@desirepower100"><i class="fa-brands fa-youtube"></i></a></i></span>
+              <span><a href="https://www.facebook.com/Jainulislam09"><i class="fa-brands fa-facebook"></i></a></i></span>
+             </p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Chat Area -->
+      <div
+        id="chat-container"
+        class="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide scroll-smooth bg-gray-50"
+      >
+        <!-- Messages will be injected here -->
+        <div
+          class="text-center text-gray-400 text-sm mt-4 italic"
+          id="empty-state"
+        >
+          Teacher is ready...
+        </div>
+      </div>
+
+      <!-- Loading Indicator (Hidden by default) -->
+      <div
+        id="loading-indicator"
+        class="hidden px-4 py-2 bg-gray-50 flex items-center space-x-2 text-xs text-purple-600 font-medium transition-all"
+      >
+        <div class="dot-flashing mx-4"></div>
+        <span>Teacher is thinking...</span>
+      </div>
+
+      <!-- Input Area -->
+      <div
+        class="p-3 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10"
+      >
+        <div
+          id="mic-status"
+          class="text-center text-xs text-red-500 font-semibold mb-2 hidden"
+        >
+          Listening... Speak now 🎤
+        </div>
+
+        <form id="chat-form" class="flex items-end gap-2">
+          <button
+            type="button"
+            id="mic-btn"
+            class="p-3 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors flex-shrink-0 border border-transparent"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+              />
+            </svg>
+          </button>
+
+          <div class="relative flex-1 ">
+            <textarea
+              id="user-input"
+              rows="1"
+              placeholder="Type or speak ..."
+              class="w-full bg-gray-100 text-gray-800 rounded-2xl px-4 text-sm py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none max-h-32"
+              required
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            id="send-btn"
+            class="p-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-md transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import {
+        getAuth,
+        signInAnonymously,
+        signInWithCustomToken,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        onSnapshot,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+      // --- Configuration AIzaSyBeWfoApl0Ylb_Vm67ggofKJcBFBc0WCmg  ---
+  //     apiKey: "AIzaSyC4r9RBMOLMdUk2cF5oAqV_Wh__0L760Nc",
+  // authDomain: "jaiho-ai-english.firebaseapp.com",
+  // projectId: "jaiho-ai-english",
+
+  //   apiKey: "AIzaSyA5_jF1G6r5Ic1JAI1XcwsOtwsjQ4Mk0wE",
+  // authDomain: "jaiai-36901.firebaseapp.com",
+  // projectId: "jaiai-36901",
+  // storageBucket: "jaiai-36901.firebasestorage.app",
+  // messagingSenderId: "895346296002",
+  // appId: "1:895346296002:web:8054ab2e2ba710d041275b",
+  // measurementId: "G-WL9Q0CNV4Q"
+  // npm install -g firebase-tools
+      const apiKey = "AIzaSyBeWfoApl0Ylb_Vm67ggofKJcBFBc0WCmg"; // Injected by environment
+      const appId = typeof __app_id !== "undefined" ? __app_id : "default-app";
+  const firebaseConfig = {
+  apiKey: "AIzaSyA5_jF1G6r5Ic1JAI1XcwsOtwsjQ4Mk0wE",
+  authDomain: "jaiai-36901.firebaseapp.com",
+  projectId: "jaiai-36901",
+  storageBucket: "jaiai-36901.firebasestorage.app",
+  messagingSenderId: "895346296002",
+  appId: "1:895346296002:web:8054ab2e2ba710d041275b",
+  measurementId: "G-WL9Q0CNV4Q"
+  }
+
+      // --- Globals ---
+      let db, auth, user, currentDocRef;
+      let chatHistory = [];
+      let isProcessing = false;
+      let currentAudio = null; // Track current audio
+
+      // --- DOM Elements ---
+      const chatContainer = document.getElementById("chat-container");
+      const chatForm = document.getElementById("chat-form");
+      const userInput = document.getElementById("user-input");
+      const sendBtn = document.getElementById("send-btn");
+      const micBtn = document.getElementById("mic-btn");
+      const micStatus = document.getElementById("mic-status");
+      const loadingIndicator = document.getElementById("loading-indicator");
+      const emptyState = document.getElementById("empty-state");
+      const startOverlay = document.getElementById("start-overlay");
+      const startClassBtn = document.getElementById("start-class-btn");
+      const stopAudioBtn = document.getElementById("stop-audio-btn");
+
+      // --- Initialization ---
+      async function initApp() {
+        if (!firebaseConfig) {
+          console.error("Firebase config missing. Chat will not persist.");
+          // Fallback: Show start button for non-firebase testing too
+          startOverlay.classList.remove("hidden");
+          return;
+        }
+
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // Auth Logic
+        try {
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (err) {
+          console.error("Auth error:", err);
+        }
+
+        onAuthStateChanged(auth, async (u) => {
+          if (u) {
+            user = u;
+            setupFirestoreListener();
+          }
+        });
+      }
+
+      function setupFirestoreListener() {
+        // Path: /artifacts/{appId}/users/{userId}/data/chat_history
+        currentDocRef = doc(
+          db,
+          "artifacts",
+          appId,
+          "users",
+          user.uid,
+          "data",
+          "supernova_chat"
+        );
+
+        onSnapshot(
+          currentDocRef,
+          (snapshot) => {
+            if (snapshot.exists()) {
+              const data = snapshot.data();
+              if (
+                data.history &&
+                Array.isArray(data.history) &&
+                data.history.length > 0
+              ) {
+                chatHistory = data.history;
+                renderChat();
+                // User has history, assume interaction has happened before or they will interact to continue
+                startOverlay.classList.add("hidden");
+              } else {
+                // History exists but is empty
+                chatHistory = [];
+                startOverlay.classList.remove("hidden");
+              }
+            } else {
+              // New user/session
+              chatHistory = [];
+              // Show start button to unlock audio context for the greeting
+              startOverlay.classList.remove("hidden");
+            }
+          },
+          (error) => {
+            console.error("Firestore Error:", error);
+          }
+        );
+      }
+
+      async function saveToFirestore() {
+        if (!currentDocRef) return;
+        // Sanitize history for saving
+        const historyToSave = chatHistory.map((msg) => ({
+          role: msg.role,
+          parts: msg.parts,
+        }));
+        try {
+          await setDoc(
+            currentDocRef,
+            { history: historyToSave },
+            { merge: true }
+          );
+        } catch (e) {
+          console.error("Save error:", e);
+        }
+      }
+
+      // --- Start Button Handler ---
+      startClassBtn.addEventListener("click", () => {
+        startOverlay.classList.add("hidden");
+        // If we are in fallback mode (no firebase) or fresh firebase session
+        if (chatHistory.length === 0) {
+          startConversation();
+        }
+      });
+
+      // --- Stop Audio Handler ---
+      function stopAudio() {
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+          currentAudio = null;
+        }
+        stopAudioBtn.classList.add("hidden");
+      }
+
+      stopAudioBtn.addEventListener("click", stopAudio);
+
+      // --- UI Logic ---
+      function scrollToBottom() {
+        chatContainer.scrollTo({
+          top: chatContainer.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+
+      function renderChat() {
+        if (chatHistory.length > 0) emptyState.style.display = "none";
+        chatContainer.innerHTML = "";
+
+        chatHistory.forEach((msg) => {
+          const isAi = msg.role === "model" || msg.role === "ai";
+          const div = document.createElement("div");
+          div.className = `flex w-full mb-4 ${
+            isAi ? "justify-start" : "justify-end"
+          }`;
+
+          // Parse message content
+          let content = msg.parts[0].text;
+
+          // If it's a JSON string from the AI, parse it to extract feedback vs question
+          let feedbackHtml = "";
+          if (isAi) {
+            try {
+              // Attempt to find JSON block if mixed with text
+              const jsonMatch = content.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const data = JSON.parse(jsonMatch[0]);
+
+                // 1. Feedback Block
+                if (data.feedback) {
+                  const isCorrect = data.feedback.isCorrect;
+                  const correction = data.feedback.correction;
+                  const userSent = data.feedback.userSentence;
+
+                  feedbackHtml = `
+                                    <div class="correction-highlight">
+                                        <div class="font-bold text-xs ${
+                                          isCorrect
+                                            ? "text-green-600"
+                                            : "text-amber-600"
+                                        } mb-1">
+                                            ${
+                                              isCorrect
+                                                ? "✅ Shabaash! (Great Job)"
+                                                : "💡 Needs Improvement"
+                                            }
+                                        </div>
+                                        <div class="text-sm italic mb-1">"${userSent}"</div>
+                                        <div class="font-medium text-indigo-700">${correction}</div>
+                                    </div>
+                                `;
+                }
+
+                // 2. Next Question
+                if (data.nextQuestion) {
+                  content = data.nextQuestion;
+                } else {
+                  content = "Let's continue!";
+                }
+              }
+            } catch (e) {
+              // Fallback if generic text
+            }
+          }
+
+          div.innerHTML = `
+                    <div class="bubble ${isAi ? "bubble-ai" : "bubble-user"}">
+                        ${feedbackHtml}
+                        <span>${content}</span>
+                    </div>
+                `;
+          chatContainer.appendChild(div);
+        });
+        scrollToBottom();
+      }
+
+      function setLoading(loading) {
+        isProcessing = loading;
+        if (loading) {
+          loadingIndicator.classList.remove("hidden");
+          loadingIndicator.classList.add("flex");
+          sendBtn.disabled = true;
+          userInput.disabled = true;
+        } else {
+          loadingIndicator.classList.add("hidden");
+          loadingIndicator.classList.remove("flex");
+          sendBtn.disabled = false;
+          userInput.disabled = false;
+          userInput.focus();
+        }
+      }
+
+      // --- Core Application Logic ---
+
+      async function startConversation() {
+        if (isProcessing) return;
+        setLoading(true);
+
+        // CHANGED: Intro now explicitly mentions friendly English teacher context, and can use Bangla for greeting.
+        const prompt = `
+                You are Supernova, a friendly English teacher. 
+                Start the conversation by introducing yourself warmly (e.g., "Hello! Ami Supernova, apnar English teacher.") and ask a simple, casual question about the user's day in English.
+                Output STRICT JSON: { "nextQuestion": "..." }
+            `;
+
+        try {
+          // Initial generation logic
+          const response = await generateContent([
+            { role: "user", parts: [{ text: prompt }] },
+          ]);
+          const aiText = response.text;
+
+          // Add to history
+          chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+          await saveToFirestore();
+
+          // Parse and Speak
+          try {
+            const data = JSON.parse(aiText);
+            if (data.nextQuestion) speakText(data.nextQuestion);
+          } catch (e) {
+            speakText(aiText);
+          }
+        } catch (e) {
+          console.error("Start error:", e);
+          const errMsg = {
+            role: "model",
+            parts: [
+              {
+                text: JSON.stringify({
+                  nextQuestion:
+                    "Oh dear, I seem to be having connection trouble. Shall we try again?",
+                }),
+              },
+            ],
+          };
+          chatHistory.push(errMsg);
+          renderChat();
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      async function handleUserResponse(text) {
+        if (!text.trim() || isProcessing) return;
+        stopAudio(); // Stop audio if user sends message
+
+        // Add user msg
+        chatHistory.push({ role: "user", parts: [{ text: text }] });
+        renderChat();
+        userInput.value = "";
+
+        setLoading(true);
+
+        // CHANGED: System prompt to provide corrections in Bangla while asking next question in English.
+        const systemPrompt = `
+                Act as 'Supernova', a friendly English teacher. 
+                1. Analyze the user's latest response: "${text}".
+                2. If grammar is wrong, explain the mistake and provide the correct sentence in **Bangla** (Bengali).
+                3. If correct, praise them in Bangla (e.g., "Khub bhalo!", "Darun hoyeche!").
+                4. Ask a NEW casual follow-up question in **English**.
+                
+                RESPONSE MUST BE STRICT JSON:
+                {
+                    "feedback": {
+                        "userSentence": "${text}",
+                        "isCorrect": boolean,
+                        "correction": "The correction and explanation in Bangla."
+                    },
+                    "nextQuestion": "The next question string in English."
+                }
+            `;
+
+        try {
+          const response = await generateContent([
+            { role: "user", parts: [{ text: systemPrompt }] },
+          ]);
+          const aiText = response.text;
+
+          // Add AI response
+          chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+          renderChat();
+          await saveToFirestore();
+
+          // Speak
+          try {
+            const data = JSON.parse(aiText);
+            if (data.nextQuestion) speakText(data.nextQuestion);
+          } catch (e) {
+            //
+          }
+        } catch (e) {
+          console.error("Chat Error", e);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      // --- Gemini API ---
+      async function generateContent(contents) {
+        // Updated to mandated model for environment stability
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: contents,
+          generationConfig: {
+            responseMimeType: "application/json",
+          },
+        };
+
+        const res = await fetchWithRetry(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        return { text: data.candidates[0].content.parts[0].text };
+      }
+
+      async function speakText(text) {
+        stopAudio(); // Stop previous audio before playing new
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+        const payload = {
+          contents: [{ parts: [{ text: text }] }],
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: "Kore" },
+              },
+            },
+          },
+          model: "gemini-2.5-flash-preview-tts",
+        };
+
+        try {
+          const res = await fetchWithRetry(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await res.json();
+          const audioContent =
+            data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+          const mimeType =
+            data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
+
+          if (audioContent) {
+            playPcmAudio(audioContent, mimeType || "audio/pcm");
+          }
+        } catch (e) {
+          console.error("TTS Error:", e);
+        }
+      }
+
+      async function fetchWithRetry(url, options, retries = 3) {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const res = await fetch(url, options);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res;
+          } catch (e) {
+            if (i === retries - 1) throw e;
+            await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, i)));
+          }
+        }
+      }
+
+      // --- Audio Handling (PCM to WAV) ---
+      function playPcmAudio(base64Data, mimeType) {
+        const binaryString = atob(base64Data);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+
+        // Extract sample rate from mimeType if available (e.g. audio/pcm; rate=24000)
+        let sampleRate = 24000;
+        const rateMatch = mimeType.match(/rate=(\d+)/);
+        if (rateMatch) sampleRate = parseInt(rateMatch[1]);
+
+        const wavBuffer = createWavHeader(bytes.length, sampleRate);
+        const combinedBuffer = new Uint8Array(wavBuffer.length + bytes.length);
+        combinedBuffer.set(wavBuffer, 0);
+        combinedBuffer.set(bytes, wavBuffer.length);
+
+        const blob = new Blob([combinedBuffer], { type: "audio/wav" });
+        const url = URL.createObjectURL(blob);
+
+        const audio = new Audio(url);
+        currentAudio = audio; // Set global current audio
+        stopAudioBtn.classList.remove("hidden"); // Show stop button
+
+        audio.onended = () => {
+          // Check if this is still the current audio before hiding UI
+          if (currentAudio === audio) {
+            currentAudio = null;
+            stopAudioBtn.classList.add("hidden");
+          }
+          URL.revokeObjectURL(url);
+        };
+
+        // Catch error specifically for play() failures
+        audio.play().catch((e) => {
+          // Fix: Ignore AbortError caused by rapid stopping/pausing
+          if (e.name === "AbortError" || e.message.includes("interrupted")) {
+            // This is expected behavior when audio is stopped manually
+            console.log("Playback interrupted intentionally.");
+          } else {
+            console.error("Playback failed:", e);
+          }
+
+          if (currentAudio === audio) {
+            stopAudioBtn.classList.add("hidden");
+          }
+        });
+      }
+
+      function createWavHeader(dataLength, sampleRate) {
+        const buffer = new ArrayBuffer(44);
+        const view = new DataView(buffer);
+
+        // RIFF chunk
+        writeString(view, 0, "RIFF");
+        view.setUint32(4, 36 + dataLength, true);
+        writeString(view, 8, "WAVE");
+        // fmt chunk
+        writeString(view, 12, "fmt ");
+        view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+        view.setUint16(20, 1, true); // AudioFormat (1 for PCM)
+        view.setUint16(22, 1, true); // NumChannels (Mono)
+        view.setUint32(24, sampleRate, true); // SampleRate
+        view.setUint32(28, sampleRate * 2, true); // ByteRate (SampleRate * BlockAlign)
+        view.setUint16(32, 2, true); // BlockAlign (NumChannels * BitsPerSample/8)
+        view.setUint16(34, 16, true); // BitsPerSample
+        // data chunk
+        writeString(view, 36, "data");
+        view.setUint32(40, dataLength, true);
+
+        return new Uint8Array(buffer);
+      }
+
+      function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
+
+      // --- STT (Speech Recognition) ---
+      if (
+        "webkitSpeechRecognition" in window ||
+        "SpeechRecognition" in window
+      ) {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-IN"; // Indian English
+
+        micBtn.addEventListener("click", () => {
+          stopAudio(); // Stop audio if mic clicked
+          if (micBtn.classList.contains("mic-active")) {
+            recognition.stop();
+          } else {
+            recognition.start();
+            micBtn.classList.add("mic-active");
+            micStatus.classList.remove("hidden");
+          }
+        });
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          userInput.value = transcript;
+          micBtn.classList.remove("mic-active");
+          micStatus.classList.add("hidden");
+          handleUserResponse(transcript); // Auto-send
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Speech error", event.error);
+          micBtn.classList.remove("mic-active");
+          micStatus.classList.add("hidden");
+        };
+
+        recognition.onend = () => {
+          micBtn.classList.remove("mic-active");
+          micStatus.classList.add("hidden");
+        };
+      } else {
+        micBtn.style.display = "none";
+        console.warn("Speech Recognition API not supported.");
+      }
+
+      // --- Event Listeners ---
+      chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleUserResponse(userInput.value);
+      });
+
+      // Auto-resize textarea
+      userInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+
+      // Start
+      initApp();
+    </script>
+  </body>
+</html>
