@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -34,7 +35,9 @@
 .subheading{
   display: flex;
   align-items: center;
-  justify-content: space-between; 
+  justify-content: space-between;
+  width: 346px;
+  gap: 2rem;
 }
       /* Chat Bubbles */
       .bubble {
@@ -232,7 +235,7 @@
         class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-md z-10"
       >
       <!-- https://i.postimg.cc/43MyVHXW/Gemini_Generated_Image_uoo5wiuoo5wiuoo5-removebg-preview.png -->
-        <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
           <div class="bg-white/20 rounded-full backdrop-blur-sm">
             <img class="rounded-full"
               src="./images/aii.gif"
@@ -243,18 +246,19 @@
           <div>
           <div class="subheading"> 
              <h1 class="font-bold text-lg">Jaiho AI English Tutor</h1>
-            </div>
+           <p  class="flex items-center gap-2 "> 
+              <span><a href="https://www.linkedin.com/in/jainulislam123/"><i class="fa-brands fa-linkedin"></i></a></i></span>
+              <span><a href="https://www.youtube.com/@desirepower100"><i class="fa-brands fa-youtube"></i></a></i></span>
+              <span><a href="https://www.facebook.com/Jainulislam09"><i class="fa-brands fa-facebook"></i></a></i></span>
+             </p></div>
+             
+            
             <p class="text-xs text-blue-100 flex items-center gap-1">
               <span
                 class="w-2 h-2 bg-green-400 rounded-full animate-pulse"
               ></span>
               Online • with Bangla Correction Mode
             </p>
-               <p  class="flex items-center gap-2"> 
-              <span><a href="https://www.linkedin.com/in/jainulislam123/"><i class="fa-brands fa-linkedin"></i></a></i></span>
-              <span><a href="https://www.youtube.com/@desirepower100"><i class="fa-brands fa-youtube"></i></a></i></span>
-              <span><a href="https://www.facebook.com/Jainulislam09"><i class="fa-brands fa-facebook"></i></a></i></span>
-             </p>
           </div>
         </div>
       </header>
@@ -319,7 +323,7 @@
             <textarea
               id="user-input"
               rows="1"
-              placeholder="Type or speak ..."
+              placeholder="Type or speak your answer..."
               class="w-full bg-gray-100 text-gray-800 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none max-h-32"
               required
             ></textarea>
@@ -379,7 +383,7 @@
   // appId: "1:895346296002:web:8054ab2e2ba710d041275b",
   // measurementId: "G-WL9Q0CNV4Q"
   // npm install -g firebase-tools
-      const apiKey = "AIzaSyBeWfoApl0Ylb_Vm67ggofKJcBFBc0WCmg"; // Injected by environment
+      const apiKey = "AIzaSyASRa6-N3NPWWlHCdVZYQX4CHFbEMHkjX0"; // Injected by environment
       const appId = typeof __app_id !== "undefined" ? __app_id : "default-app";
   const firebaseConfig = {
   apiKey: "AIzaSyA5_jF1G6r5Ic1JAI1XcwsOtwsjQ4Mk0wE",
